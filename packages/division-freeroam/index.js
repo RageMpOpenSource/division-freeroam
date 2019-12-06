@@ -32,6 +32,7 @@ server.prefix.server = '!{42f49b}[SERVER] !{fff}';
 server.loadModules = function(){
     require('./auth.js');
     require('./events/playerChat.js');
+    require('./events/playerQuit.js');
     require('./components/charcreator.js');
 }
 
