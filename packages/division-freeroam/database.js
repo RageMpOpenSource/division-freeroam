@@ -1,4 +1,4 @@
-const pool = require('mysql2/promise').createPool({host: server.config.db_host, user: server.config.db_username, password: server.config.db_password, database: server.config.db_name, connectionLimit: server.config.db_connectionLimit});
+const pool = require('mysql2/promise').createPool({host: server.config.db_host, user: server.config.db_username, password: server.config.db_password, database: server.config.db_name, connectionLimit: server.config.db_connectionLimit, multipleStatements: true});
 
 pool.getConnection().then(conn => {
     console.log(`${server.chalk.green('[Database]')} Connected successfully.`);

@@ -20,15 +20,16 @@ mp.events.add("playerJoin", async (player) => {
 });
 
 async function loadAccountData(user, identity){
-    await server.db.query('SELECT * FROM `accounts` WHERE `Identity` = ?', [identity]).then(([res]) => {
-        res[0].Username != null ? user.name = res[0].Username : console.log('Force username');
-        if(res[0].Outfit != null){
+    await server.db.query('SELECT * FROM `accounts` WHERE `Identity` = ?; UPDATE `accounts` SET `LastActive` = CURRENT_TIMESTAMP WHERE `Identity` = ?', [identity, identity]).then(([res]) => {
+        res[0][0].Username != null ? user.name = res[0][0].Username : console.log('Force username');
+        console.log(`${JSON.stringify(res[0][0].Outfit)}`);
+        if(res[0][0].Outfit != null){
             user.loadCharacter();
         } else {
             user.defaultCharacter();    //  Stops error
             user.sendToCreator();
         }
-        user.data.level = res[0].Level;
-        user.data.money = res[0].Money;
+        user.data.level = res[0][0].Level;
+        user.data.money = res[0][0].Money;
     }).catch(err => console.log(`${server.chalk.red(err)}`));
 }
