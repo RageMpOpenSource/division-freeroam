@@ -4,7 +4,3 @@ mp.events.add("playerQuit", async (player) => {
         console.log(`${server.chalk.red(name)} has quit the server.`);
     })
 });
-
-mp.events.addCommand('updatemoney', (player, mon) => {
-    player.data.money = parseInt(mon);
-})

@@ -34,8 +34,5 @@ server.loadModules = function(){
     require('./events/playerChat.js');
     require('./events/playerQuit.js');
     require('./components/charcreator.js');
+    require('./commands.js');
 }
-
-mp.events.addCommand("money", (player) => {
-    player.outputChatBox(`$${player.data.money}`)
-});

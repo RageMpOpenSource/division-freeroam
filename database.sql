@@ -8,6 +8,7 @@ CREATE TABLE `division-freeroam`.`accounts` (
     `Username` VARCHAR(50),
     `RegDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `LastActive` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `Email` VARCHAR(50),
     `Level` INT NOT NULL DEFAULT(1),
     `Outfit` JSON,
     `Money` INT NOT NULL DEFAULT(5000),

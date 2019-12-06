@@ -21,14 +21,14 @@ mp.events.add("playerJoin", async (player) => {
 
 async function loadAccountData(user, identity){
     await server.db.query('SELECT * FROM `accounts` WHERE `Identity` = ?; UPDATE `accounts` SET `LastActive` = CURRENT_TIMESTAMP WHERE `Identity` = ?', [identity, identity]).then(([res]) => {
-        res[0][0].Username != null ? user.name = res[0][0].Username : console.log('Force username');
-        console.log(`${JSON.stringify(res[0][0].Outfit)}`);
+        res[0][0].Username != null ? user.name = res[0][0].Username : user.outputChatBox(`${server.prefix.info} You do not have a username set.`);
         if(res[0][0].Outfit != null){
             user.loadCharacter();
         } else {
             user.defaultCharacter();    //  Stops error
             user.sendToCreator();
         }
+        if(res[0][0].Email === null) return user.outputChatBox(`${server.prefix.info} You do not have an email linked to this account. use /setemail [email] to set your email.`)
         user.data.level = res[0][0].Level;
         user.data.money = res[0][0].Money;
     }).catch(err => console.log(`${server.chalk.red(err)}`));
