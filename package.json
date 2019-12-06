@@ -1,0 +1,24 @@
+{
+  "name": "division-freeroam",
+  "version": "1.0.0",
+  "description": "Division freeroam info",
+  "main": "index.js",
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "mysql2": "^2.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrPancakers/division-freeroam.git"
+  },
+  "author": "MrPancakers",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrPancakers/division-freeroam/issues"
+  },
+  "homepage": "https://github.com/MrPancakers/division-freeroam#readme"
+}

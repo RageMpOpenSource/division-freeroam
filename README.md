@@ -1,2 +1,2 @@
-# division-freeroam
-RageMP Freeroam Gamemode
+# Division Freeroam
+Division freeroam info
