@@ -1,30 +1,39 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 
-mp.events.add("playerJoin", async (player) => {
+mp.events.add("playerReady", async (player) => {
     let user = `${player.socialClub}#${player.serial}`; //  Change to rsscid 1.0
     let hash = crypto.createHash('md5').update(user).digest('hex');
 
     await server.db.query('SELECT `Identity`, `Password` FROM `accounts` WHERE `Identity` = ?', [hash]).then(([res]) => {
+        player.identity = hash;
         if(res.length === 0){   //  New User
             server.db.query('INSERT INTO `accounts` (`Identity`) VALUES (?)', [hash]).then(() => {
                 console.log(`${server.chalk.green(player.name)} has just joined for the first time!`);
-                player.identity = hash;
                 server.auth.loadAccount(player, hash);
             }).catch(err => console.log(`${server.chalk.red(err)}`));
         } else {    //  Returning User
             if(res[0].Password != null){
-                player.outputChatBox('Must enter password');
-                //  Remove the below lines once we have a password input
-                console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
-                player.identity = hash;
-                server.auth.loadAccount(player, hash);
+                player.call('showLogin');
             } else {
                 console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
-                player.identity = hash;
                 server.auth.loadAccount(player, hash);
             }
         }
+    }).catch(err => console.log(`${server.chalk.red(err)}`));
+});
+
+mp.events.add('verifyPassword', async (player, password) => {
+    await server.db.query('SELECT `Password` FROM `accounts` WHERE `Identity` = ?', [player.identity]).then(([res]) => {
+        bcrypt.compare(password, res[0].Password).then((res) => {
+            if(res){
+                console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
+                server.auth.loadAccount(player, player.identity);
+                player.call('hideLogin');
+            } else {
+                player.call('loginError', ['Incorrect password']);
+            }
+        }).catch(err => console.log(`${server.chalk.red(err)}`));; 
     }).catch(err => console.log(`${server.chalk.red(err)}`));
 });
 

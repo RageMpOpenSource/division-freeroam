@@ -1,0 +1,9 @@
+html body {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+#loginInput {
+    max-width:500px;
+    margin-top:30%;
+    margin-left:25%;
+}
