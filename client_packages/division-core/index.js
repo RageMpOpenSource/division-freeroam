@@ -1,4 +1,5 @@
 require('division-core/keybinds.js');
+require('division-core/ui/rage-ui.js');
 
 //  Set all stats to max for all players to be equal
 mp.game.stats.statSetInt(mp.game.joaat('SP0_STAMINA'), 100, false);

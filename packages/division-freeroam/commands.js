@@ -1,22 +1,17 @@
-mp.events.addCommand("money", (player) => {
-    player.outputChatBox(`$${player.data.money}`)
+mp.events.addCommand('stats', (player) => {
+    player.outputChatBox(`Level: ${player.getLevel()}, Money: ${player.getMoney()}, Group: ${player.getVariable('group')}`)
 });
 
-mp.events.addCommand('updatemoney', (player, mon) => {
-    player.data.money = parseInt(mon);
-})
-
-mp.events.addCommand('setemail', async (player, email) => {
-    if(validEmail(email)){
-        await server.db.query('UPDATE `accounts` SET `Email` = ? WHERE `Identity` = ?', [email, player.identity]).then(() => {
-            player.outputChatBox(`${server.prefix.info} Email successfully set.`);
-        });
-    } else {
-        player.outputChatBox(`${server.prefix.error} The email you have entered is not valid.`);
-    }
+mp.events.addCommand('updatemoney', (player, amount) => {
+    player.setMoney(amount);
 });
 
-function validEmail(email) {
-    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-}
+mp.events.addCommand('groups', (player) => {
+    server.groupData.forEach(function(group){
+        player.outputChatBox(`Group: ${JSON.stringify(group)}`);
+    });
+});
+
+mp.events.addCommand('changepass', (player, password) => {
+    server.auth.changePassword(player, password);
+});

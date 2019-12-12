@@ -137,6 +137,7 @@ mp.events.add("playerJoin", (player) => {
         player.usingCreator = false;
         player.changedGender = false;
         player.call("toggleCreator", [false]);
+        player.call('toggleUI', [true]);
     };
 });
 

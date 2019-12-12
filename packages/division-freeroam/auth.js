@@ -1,35 +1,60 @@
 const crypto = require('crypto');
+const bcrypt = require('bcryptjs');
 
 mp.events.add("playerJoin", async (player) => {
     let user = `${player.socialClub}#${player.serial}`; //  Change to rsscid 1.0
     let hash = crypto.createHash('md5').update(user).digest('hex');
 
-    await server.db.query('SELECT `Identity` FROM `accounts` WHERE `Identity` = ?', [hash]).then(([res]) => {
-        if(res.length === 0){   //  New User - Must create a username
+    await server.db.query('SELECT `Identity`, `Password` FROM `accounts` WHERE `Identity` = ?', [hash]).then(([res]) => {
+        if(res.length === 0){   //  New User
             server.db.query('INSERT INTO `accounts` (`Identity`) VALUES (?)', [hash]).then(() => {
                 console.log(`${server.chalk.green(player.name)} has just joined for the first time!`);
                 player.identity = hash;
-                loadAccountData(player, hash);
+                server.auth.loadAccount(player, hash);
             }).catch(err => console.log(`${server.chalk.red(err)}`));
         } else {    //  Returning User
-            console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
-            player.identity = hash;
-            loadAccountData(player, hash);
+            if(res[0].Password != null){
+                player.outputChatBox('Must enter password');
+                //  Remove the below lines once we have a password input
+                console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
+                player.identity = hash;
+                server.auth.loadAccount(player, hash);
+            } else {
+                console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
+                player.identity = hash;
+                server.auth.loadAccount(player, hash);
+            }
         }
     }).catch(err => console.log(`${server.chalk.red(err)}`));
 });
 
-async function loadAccountData(user, identity){
-    await server.db.query('SELECT * FROM `accounts` WHERE `Identity` = ?; UPDATE `accounts` SET `LastActive` = CURRENT_TIMESTAMP WHERE `Identity` = ?', [identity, identity]).then(([res]) => {
-        res[0][0].Username != null ? user.name = res[0][0].Username : user.outputChatBox(`${server.prefix.info} You do not have a username set.`);
-        if(res[0][0].Outfit != null){
-            user.loadCharacter();
-        } else {
-            user.defaultCharacter();    //  Stops error
-            user.sendToCreator();
-        }
-        if(res[0][0].Email === null) return user.outputChatBox(`${server.prefix.info} You do not have an email linked to this account. use /setemail [email] to set your email.`)
-        user.data.level = res[0][0].Level;
-        user.data.money = res[0][0].Money;
-    }).catch(err => console.log(`${server.chalk.red(err)}`));
+module.exports = {
+    loadAccount: async function(user, identity){
+        await server.db.query('SELECT * FROM `accounts` WHERE `Identity` = ?; UPDATE `accounts` SET `LastActive` = CURRENT_TIMESTAMP WHERE `Identity` = ?', [identity, identity]).then(([res]) => {
+            if(res[0][0].Username != null) user.name = res[0][0].Username;
+            if(res[0][0].Outfit != null){
+                user.loadCharacter();
+                user.call('toggleUI', [true]);
+            } else {
+                user.defaultCharacter();    //  Stops error
+                user.sendToCreator();
+            }
+            user.setMoney(res[0][0].Money);
+            user.setLevel(res[0][0].Level);
+            user.setVariable('group', res[0][0].Group);
+        }).catch(err => console.log(`${server.chalk.red(err)}`));
+    },
+    changePassword: function(user, password){
+        if(password.length <= 5) return user.outputChatBox(`${server.prefix.error} Passwords must be at least 6 characters long`);
+        bcrypt.genSalt(10, function(err, salt) {
+            if(err) return console.log(`${chalk.red('[BCrypt Error]')} Issue generating salt.`);
+            bcrypt.hash(password, salt, async function(err, hash) {
+                if(err) return console.log(`${chalk.red('[BCrypt Error]')} Issue hashing password.`);
+                await server.db.query('UPDATE `accounts` SET `Password` = ? WHERE `Identity` = ?', [hash, user.identity]).then(() => {
+                    console.log(`${user.name} has changed their password.`);
+                    user.outputChatBox(`${server.prefix.info} You have successfully changed your password`)
+                }).catch(err => console.log(`${server.chalk.red(err)}`));
+            });
+        });
+    }
 }

@@ -30,9 +30,15 @@ server.prefix.server = '!{42f49b}[SERVER] !{fff}';
 })();
 
 server.loadModules = function(){
-    require('./auth.js');
+    require('./wrapper/Player.js');
+    server.auth = require('./auth.js');
     require('./events/playerChat.js');
     require('./events/playerQuit.js');
     require('./components/charcreator.js');
     require('./commands.js');
+    server.groups = require('./components/groups.js');
 }
+
+mp.events.addCommand('ui', (player) => {
+    player.call('toggleUI', [false])
+})
