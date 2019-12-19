@@ -37,8 +37,5 @@ server.loadModules = function(){
     require('./components/charcreator.js');
     require('./commands.js');
     server.groups = require('./components/groups.js');
+    require('./admin_commands.js');
 }
-
-mp.events.addCommand('ui', (player) => {
-    player.call('toggleUI', [false])
-})

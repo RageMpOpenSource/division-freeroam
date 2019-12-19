@@ -6,7 +6,6 @@ pool.getConnection().then(conn => {
     conn.release();
     return;
 }).catch(err => {
-    console.log(`Err: ${err}`);
     switch(err.code){
         case 'PROTOCOL_CONNECTION_LOST':
             console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: Database connection was closed.')}`);
@@ -30,7 +29,7 @@ pool.getConnection().then(conn => {
             console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: Database host not found.')}`);
             break;
         default:
-            console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: ' + err.code)}`);
+            console.log(`${server.chalk.red(err)}`);
             break;
         }
 });

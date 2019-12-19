@@ -39,3 +39,27 @@ mp.Player.prototype.setLevel = function(level){
     if(isNaN(level) || level < 0) return this.outputChatBox(`${server.prefix.error} The level you entered is not a number`);
     return this.setVariable('level', level);
 }
+
+/**
+ * Returns the players group level.
+ * @return {int} Group level
+ * @example
+ *  player.outputChatBox(`Your group level is: ${player.getGroup()}`);
+ */
+mp.Player.prototype.getGroup = function(){
+    return this.getVariable('group');
+}
+
+/**
+ * Sets the players group level
+ * @param {int} groupID - A group level ID
+ * @example
+ *  //  Set the group level to owner
+ *  player.setGroup(255);
+ */
+mp.Player.prototype.setGroup = function(groupID){
+    let targetGroup = server.groups.getGroup(groupID);
+    if(targetGroup == undefined) return;
+    this.setVariable('group', groupID);
+    this.outputChatBox(`${server.prefix.info} Your group has been updated to ${targetGroup.Name}`);
+}
