@@ -2,6 +2,8 @@
  *  Division Freeroam
  *  Github: https://github.com/MrPancakers/division-freeroam
  *  Author: MrPancakers
+ *  Credits:
+ *      +> root [v-cargens](https://github.com/root-cause/v-cargens)
  */
 
 setInterval(()=>{}, 0); //  Used to fix async stuff
@@ -38,4 +40,5 @@ server.loadModules = function(){
     require('./commands.js');
     server.groups = require('./components/groups.js');
     require('./admin_commands.js');
+    require('./random-vehicles.js');
 }
