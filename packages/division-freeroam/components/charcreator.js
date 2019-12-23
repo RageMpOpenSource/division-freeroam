@@ -173,17 +173,3 @@ mp.events.add("creator_Leave", (player) => {
     player.applyCharacter();
     player.sendToWorld();
 });
-
-mp.events.addCommand("creator", (player) => {
-    if (freemodeCharacters.indexOf(player.model) == -1) {
-        player.outputChatBox("/creator command is restricted to freemode characters.");
-    } else if (player.vehicle) {
-        player.outputChatBox("You can't use this command inside a vehicle.");
-    } else {
-        if (player.usingCreator) {
-            player.sendToWorld();
-        } else {
-            player.sendToCreator();
-        }
-    }
-});
