@@ -36,6 +36,7 @@ server.loadModules = function(){
     server.auth = require('./auth.js');
     require('./events/playerChat.js');
     require('./events/playerQuit.js');
+    require('./events/playerDeath.js');
     require('./components/charcreator.js');
     require('./commands.js');
     server.groups = require('./components/groups.js');

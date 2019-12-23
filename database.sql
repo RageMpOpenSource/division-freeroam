@@ -13,6 +13,7 @@ CREATE TABLE `division-freeroam`.`accounts` (
     `Group` tinyint UNSIGNED NOT NULL DEFAULT 0,
     `Outfit` JSON,
     `Money` INT NOT NULL DEFAULT(5000),
+    `Prisoned` BOOLEAN NOT NULL DEFAULT 0,
     PRIMARY KEY(`ID`)
 );
 

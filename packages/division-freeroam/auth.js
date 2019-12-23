@@ -42,19 +42,21 @@ module.exports = {
     loadAccount: async function(user, identity){
         await server.db.query('SELECT * FROM `accounts` WHERE `Identity` = ?; UPDATE `accounts` SET `LastActive` = CURRENT_TIMESTAMP WHERE `Identity` = ?', [identity, identity]).then(([res]) => {
             if(res[0][0].Username != null) user.name = res[0][0].Username;
+            user.setMoney(res[0][0].Money);
+            user.setLevel(res[0][0].Level);
+            user.setGroup(res[0][0].Group)
+            user.setVariable('sqlID', res[0][0].ID);
+            user.setVariable('muted', false);
+            user.setVariable('prisoned', res[0][0].Prisoned);
+
             if(res[0][0].Outfit != null){
                 user.loadCharacter();
                 user.call('toggleUI', [true]);
+                server.auth.spawnPlayer(user);
             } else {
                 user.defaultCharacter();    //  Stops error
                 user.sendToCreator();
             }
-            user.setMoney(res[0][0].Money);
-            user.setLevel(res[0][0].Level);
-            user.setVariable('group', res[0][0].Group);
-            user.setVariable('muted', false);
-            
-            user.position = spawnPoints.Locations[Math.floor(Math.random() * spawnPoints.Locations.length) + 1];
         }).catch(err => console.log(`${server.chalk.red(err)}`));
     },
     changePassword: function(user, password){
@@ -69,5 +71,14 @@ module.exports = {
                 }).catch(err => console.log(`${server.chalk.red(err)}`));
             });
         });
+    },
+    spawnPlayer: function(user){
+        if(user.getVariable('prisoned') == 1){
+            user.spawn(new mp.Vector3(459.89, -1001.46, 24.91));
+            user.dimension = 0;
+            user.outputChatBox(`${server.prefix.server} You have spawned in admin jail as you were prisoned during your last session`);
+        } else {
+            user.spawn(spawnPoints.Locations[Math.floor(Math.random() * spawnPoints.Locations.length) + 1]);
+        }
     }
 }
