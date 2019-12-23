@@ -52,6 +52,7 @@ module.exports = {
             user.setMoney(res[0][0].Money);
             user.setLevel(res[0][0].Level);
             user.setVariable('group', res[0][0].Group);
+            user.setVariable('muted', false);
             
             user.position = spawnPoints.Locations[Math.floor(Math.random() * spawnPoints.Locations.length) + 1];
         }).catch(err => console.log(`${server.chalk.red(err)}`));

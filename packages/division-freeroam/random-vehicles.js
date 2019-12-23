@@ -3,7 +3,7 @@ const data = require("./CarGens_ZoneVehicles.json");
 let count = 0;
 for (let i = 0; i < data.length; i++) {
     let skip = Math.random();
-    if(skip >= 0.5) continue;
+    if(skip >= 0.1) continue;
     
     if (data[i].models.length === 0) {
         continue;
@@ -22,8 +22,3 @@ for (let i = 0; i < data.length; i++) {
 }
 
 console.log(`Created ${count} vehicles.`);
-
-mp.events.addCommand('pos', player => {
-    console.log(`"x": ${player.position.x}, "y": ${player.position.y}, "z": ${player.position.z}`);
-    console.log(`"x": ${player.vehicle.position.x}, "y": ${player.vehicle.position.y}, "z": ${player.vehicle.position.z}`);
-})
