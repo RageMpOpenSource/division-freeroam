@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const spawnPoints = require('./spawn_points.json');
+const spawnPoints = require('./data/PlayerSpawn.json');
 
 mp.events.add("playerReady", async (player) => {
     let user = `${player.socialClub}#${player.serial}`; //  Change to rsscid 1.0

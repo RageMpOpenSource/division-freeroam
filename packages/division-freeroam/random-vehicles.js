@@ -1,4 +1,4 @@
-const data = require("./CarGens_ZoneVehicles.json");
+const data = require("./data/CarGenerations.json");
 
 let count = 0;
 for (let i = 0; i < data.length; i++) {

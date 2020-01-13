@@ -40,6 +40,6 @@ server.loadModules = function(){
     require('./components/charcreator.js');
     require('./commands.js');
     server.groups = require('./components/groups.js');
-    require('./admin_commands.js');
+    require('./admin.js');
     require('./random-vehicles.js');
 }
