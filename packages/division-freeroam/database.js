@@ -2,6 +2,7 @@ const pool = require('mysql2/promise').createPool({host: server.config.db_host, 
 
 pool.getConnection().then(conn => {
     console.log(`${server.chalk.green('[Database]')} Connected successfully.`);
+    server.loadCore();
     server.loadModules();
     conn.release();
     return;

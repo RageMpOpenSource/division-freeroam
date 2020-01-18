@@ -12,6 +12,7 @@ global.server = {};
 
 const fs = require('fs');
 server.chalk = require('chalk');
+require('./components.js');
 
 if(!fs.existsSync(`${__dirname}/config.json`)){
     console.log(`${chalk.red('You do not have a \'config.json\' file setup.')}`);
@@ -31,15 +32,4 @@ server.prefix.server = '!{42f49b}[SERVER] !{fff}';
     server.db = await require('./database.js');
 })();
 
-server.loadModules = function(){
-    require('./wrapper/Player.js');
-    server.auth = require('./auth.js');
-    require('./events/playerChat.js');
-    require('./events/playerQuit.js');
-    require('./events/playerDeath.js');
-    require('./components/charcreator.js');
-    require('./commands.js');
-    server.groups = require('./components/groups.js');
-    require('./admin.js');
-    require('./random-vehicles.js');
-}
+require('./wrapper/Player.js');

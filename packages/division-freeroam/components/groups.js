@@ -1,16 +1,17 @@
 server.groupData = [];
 
-(async () => {
-    await server.db.query('SELECT * FROM `groups`').then(([rows]) => {
-        let l = rows.length;
-        for(var i = 0; i < l; i++){
-            server.groupData.push(rows[i]);
-        }
-        console.log(`${server.groupData.length} groups loaded.`);
-    }).catch(err => console.log(`${server.chalk.red(err)}`));
-})();
-
 module.exports = {
+    start: function(){
+        return new Promise(async (resolve, reject) => {
+            await server.db.query('SELECT * FROM `groups`').then(([rows]) => {
+                let l = rows.length;
+                for(var i = 0; i < l; i++){
+                    server.groupData.push(rows[i]);
+                }
+                resolve(`${server.groupData.length} groups loaded.`);
+            }).catch(err => reject(err));
+        });
+    },
     add: async function(player, name, level){
         try {
             let group = server.groups.getGroup(name);
