@@ -4,4 +4,5 @@ node.dll
 server.exe
 client_packages/.listcache
 node_modules
+logs
 packages/division-freeroam/config.json

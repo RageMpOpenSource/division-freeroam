@@ -1,6 +1,14 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const spawnPoints = require('./data/PlayerSpawn.json');
+//TEMP, ORGANISE THESE LEVELS BETTER
+const requiredExperiences = require("./data/xpdata"); // 8000 levels from GTA Online - credit: https://pastebin.com/fFkUygTy
+const maxLevel = requiredExperiences.length - 1;
+const maxExperience = requiredExperiences[maxLevel];
+const clamp = (value, min, max) => {
+    return value <= min ? min : value >= max ? max : value;
+};
+
 
 mp.events.add("playerReady", async (player) => {
     let user = `${player.socialClub}#${player.serial}`; //  Change to rsscid 1.0
@@ -43,11 +51,12 @@ module.exports = {
         await server.db.query('SELECT * FROM `accounts` WHERE `Identity` = ?; UPDATE `accounts` SET `LastActive` = CURRENT_TIMESTAMP WHERE `Identity` = ?', [identity, identity]).then(([res]) => {
             if(res[0][0].Username != null) user.name = res[0][0].Username;
             user.setMoney(res[0][0].Money);
-            user.setLevel(res[0][0].Level);
             user.setGroup(res[0][0].Group)
             user.setVariable('sqlID', res[0][0].ID);
             user.setVariable('muted', false);
             user.setVariable('prisoned', res[0][0].Prisoned);
+            user.data.currentLevel = clamp(res[0][0].Level, 1, maxLevel);
+            user.data.currentXP = clamp(res[0][0].Experience, 0, maxExperience);
 
             if(res[0][0].Outfit != null){
                 user.loadCharacter();

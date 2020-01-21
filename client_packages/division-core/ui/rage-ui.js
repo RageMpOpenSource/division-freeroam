@@ -9,7 +9,7 @@ mp.events.addDataHandler('money', (entity, value) => {
     money = value;
 });
 
-mp.events.addDataHandler('level', (entity, value) => {
+mp.events.addDataHandler('currentLevel', (entity, value) => {
     level = value;
 });
 

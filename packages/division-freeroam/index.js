@@ -4,6 +4,7 @@
  *  Author: MrPancakers
  *  Credits:
  *      +> root [v-cargens](https://github.com/root-cause/v-cargens)
+ *              [levels](https://rage.mp/files/file/75-levels/)
  */
 
 setInterval(()=>{}, 0); //  Used to fix async stuff
@@ -14,6 +15,7 @@ const fs = require('fs');
 server.chalk = require('chalk');
 server.logger = require('./logger.js');
 
+require('./wrapper/Player.js');
 require('./components.js');
 
 if(!fs.existsSync(`${__dirname}/config.json`)){
@@ -33,5 +35,3 @@ server.prefix.server = '!{42f49b}[SERVER] !{fff}';
 (async () => {
     server.db = await require('./database.js');
 })();
-
-require('./wrapper/Player.js');
