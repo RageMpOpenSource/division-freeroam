@@ -6,7 +6,8 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "chalk": "^3.0.0",
-    "mysql2": "^2.0.1"
+    "mysql2": "^2.0.1",
+    "winston": "^3.2.1"
   },
   "devDependencies": {},
   "scripts": {

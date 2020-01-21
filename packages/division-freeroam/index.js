@@ -12,6 +12,8 @@ global.server = {};
 
 const fs = require('fs');
 server.chalk = require('chalk');
+server.logger = require('./logger.js');
+
 require('./components.js');
 
 if(!fs.existsSync(`${__dirname}/config.json`)){
