@@ -55,8 +55,8 @@ module.exports = {
             user.setVariable('sqlID', res[0][0].ID);
             user.setVariable('muted', false);
             user.setVariable('prisoned', res[0][0].Prisoned);
-            user.data.currentLevel = clamp(res[0][0].Level, 1, maxLevel);
-            user.data.currentXP = clamp(res[0][0].Experience, 0, maxExperience);
+            user.setVariable('level', clamp(res[0][0].Level, 1, maxLevel)); //  Cannot use setLevel() here
+            user.setVariable('xp', clamp(res[0][0].Experience, 0, maxExperience));
 
             if(res[0][0].Outfit != null){
                 user.loadCharacter();

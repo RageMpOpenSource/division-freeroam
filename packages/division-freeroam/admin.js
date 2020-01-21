@@ -244,6 +244,36 @@ mp.events.addCommand({
         if(player.getGroup() != 255) return player.outputChatBox(server.prefix.permission);
         if(!groupID) return player.outputChatBox(`${server.prefix.syntax} /deletegroup [group_id]`);
         server.groups.remove(player, groupID);
+    },
+    'setlevel': (player, _, targetID, level) => {
+        if(player.getGroup() != 255) return player.outputChatBox(server.prefix.permission);
+        if(!targetID || !level) return player.outputChatBox(`${server.prefix.syntax} /setlevel [player_id] [level]`); 
+        if(mp.players.exists(parseInt(targetID))){
+            let target = mp.players.at(parseInt(targetID));
+            target.setLevel(level);
+        } else {
+            player.outputChatBox(`${server.prefix.error} There is no player with that ID.`);
+        }
+    },
+    'setxp': (player, _, targetID, xp) => {
+        if(player.getGroup() != 255) return player.outputChatBox(server.prefix.permission);
+        if(!targetID || !xp) return player.outputChatBox(`${server.prefix.syntax} /setxp [player_id] [xp]`); 
+        if(mp.players.exists(parseInt(targetID))){
+            let target = mp.players.at(parseInt(targetID));
+            target.setXP(xp);
+        } else {
+            player.outputChatBox(`${server.prefix.error} There is no player with that ID.`);
+        }
+    },
+    'changexp': (player, _, targetID, xp) => {
+        if(player.getGroup() != 255) return player.outputChatBox(server.prefix.permission);
+        if(!targetID || !xp) return player.outputChatBox(`${server.prefix.syntax} /changexp [player_id] [xp]`); 
+        if(mp.players.exists(parseInt(targetID))){
+            let target = mp.players.at(parseInt(targetID));
+            target.changeXP(xp);
+        } else {
+            player.outputChatBox(`${server.prefix.error} There is no player with that ID.`);
+        }
     }
 });
 

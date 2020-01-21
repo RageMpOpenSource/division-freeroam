@@ -16,7 +16,7 @@ mp.events.add("updateRankBar", (limit, nextLimit, previousXP) => {
     mp.game.graphics.pushScaleformMovieFunctionParameterInt(limit);
     mp.game.graphics.pushScaleformMovieFunctionParameterInt(nextLimit);
     mp.game.graphics.pushScaleformMovieFunctionParameterInt(previousXP);
-    mp.game.graphics.pushScaleformMovieFunctionParameterInt(mp.players.local.getVariable("currentXP"));
-    mp.game.graphics.pushScaleformMovieFunctionParameterInt(mp.players.local.getVariable("currentLevel"));
+    mp.game.graphics.pushScaleformMovieFunctionParameterInt(mp.players.local.getVariable("xp"));
+    mp.game.graphics.pushScaleformMovieFunctionParameterInt(mp.players.local.getVariable("level"));
     mp.game.graphics.popScaleformMovieFunctionVoid();
 });

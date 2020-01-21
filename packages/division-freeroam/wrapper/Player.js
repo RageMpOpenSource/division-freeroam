@@ -38,7 +38,11 @@ mp.Player.prototype.setMoney = function(amount){
  *  player.getLevel();
  */
 mp.Player.prototype.getLevel = function(){
-    return this.data.currentLevel;
+    return this.getVariable('level');
+}
+
+mp.Player.prototype.getXP = function(){
+    return this.getVariable('xp');
 }
 
 /**
@@ -47,19 +51,19 @@ mp.Player.prototype.getLevel = function(){
  * @example
  *  player.setLevel(31);
  */
-mp.Player.prototype.setLevel = function(newLevel){
-    if(isNaN(newLevel)) return this.outputChatBox(`${server.prefix.error} You did not enter a valid number`)
-    let lvl = parseInt(newLevel);
+mp.Player.prototype.setLevel = function(lvl){
+    if(isNaN(lvl)) return;
+    let newLevel = parseInt(lvl);
     let prevLevel = this.getLevel();
-    this.data.currentLevel = clamp(lvl, 1, maxLevel);
+    this.setVariable('level', clamp(newLevel, 1, maxLevel));
 
-    if (this.data.currentLevel != prevLevel) {
-        let prevXP = this.data.currentXP;
-        this.data.currentXP = requiredExperiences[this.data.currentLevel - 1] + ((this.data.currentLevel > 1) ? 1 : 0);
+    if (this.getLevel() != prevLevel) {
+        let prevXP = this.getXP();
+        this.setVariable('xp', requiredExperiences[this.getLevel() - 1] + ((this.getLevel() > 1) ? 1 : 0));
 
-        if (this.data.currentXP != prevXP) mp.events.call("playerXPChange", this, prevXP, this.data.currentXP, this.data.currentXP - prevXP);
-        mp.events.call("playerLevelChange", this, prevLevel, this.data.currentLevel);
-        this.call("updateRankBar", [requiredExperiences[this.data.currentLevel - 1], requiredExperiences[this.data.currentLevel], prevXP]);
+        if (this.getXP() != prevXP) mp.events.call("playerXPChange", this, prevXP, this.getXP(), this.getXP() - prevXP);
+        mp.events.call("playerLevelChange", this, prevLevel, this.getLevel());
+        this.call("updateRankBar", [requiredExperiences[this.getLevel() - 1], requiredExperiences[this.getLevel()], prevXP]);
     }
 }
 
@@ -70,21 +74,21 @@ mp.Player.prototype.setLevel = function(newLevel){
  *  player.setXP(3000); //  Will put them at level 3.
  */
 mp.Player.prototype.setXP = function(xp){
-    console.log(`set xp ran`)
+    if(isNaN(xp)) return;
     let newXP = parseInt(xp);
-    let prevXP = this.data.currentXP;
-    this.data.currentXP = clamp(newXP, 0, maxExperience);
+    let prevXP = this.getXP();
+    this.setVariable('xp', clamp(newXP, 0, maxExperience));
 
-    if (this.data.currentXP != prevXP) {
-        mp.events.call("playerXPChange", this, prevXP, this.data.currentXP, this.data.currentXP - prevXP);
+    if (this.getXP() != prevXP) {
+        mp.events.call("playerXPChange", this, prevXP, this.getXP(), this.getXP() - prevXP);
 
-        let calculatedLevel = levelFromXP(this.data.currentXP);
-        if (this.data.currentLevel != calculatedLevel) {
-            mp.events.call("playerLevelChange", this, this.data.currentLevel, calculatedLevel);
-            this.data.currentLevel = calculatedLevel;
+        let calculatedLevel = levelFromXP(this.getXP());
+        if (this.getLevel() != calculatedLevel) {
+            mp.events.call("playerLevelChange", this, this.getLevel(), calculatedLevel);
+            this.setVariable('level', calculatedLevel);
         }
 
-        this.call("updateRankBar", [requiredExperiences[this.data.currentLevel - 1], requiredExperiences[this.data.currentLevel], prevXP]);
+        this.call("updateRankBar", [requiredExperiences[this.getLevel() - 1], requiredExperiences[this.getLevel()], prevXP]);
     }
 }
 
@@ -95,29 +99,29 @@ mp.Player.prototype.setXP = function(xp){
  *  player.changeXP(50); // Adds 50 XP on top of a players current XP amount
  */
 mp.Player.prototype.changeXP = function(xp){
+    if(isNaN(xp)) return;
     let xpAmount = parseInt(xp);
-    let prevXP = this.data.currentXP;
-    this.data.currentXP = clamp(prevXP + xpAmount, 0, maxExperience);
+    let prevXP = this.getXP();
+    this.setVariable('xp', clamp(prevXP + xpAmount, 0, maxExperience));
 
-    if (this.data.currentXP != prevXP) {
-        mp.events.call("playerXPChange", this, prevXP, this.data.currentXP, this.data.currentXP - prevXP);
+    if (this.getXP() != prevXP) {
+        mp.events.call("playerXPChange", this, prevXP, this.getXP(), this.getXP() - prevXP);
 
-        let calculatedLevel = levelFromXP(this.data.currentXP);
-        if (this.data.currentLevel != calculatedLevel) {
-            mp.events.call("playerLevelChange", this, this.data.currentLevel, calculatedLevel);
-            this.data.currentLevel = calculatedLevel;
+        let calculatedLevel = levelFromXP(this.getXP());
+        if (this.getLevel() != calculatedLevel) {
+            mp.events.call("playerLevelChange", this, this.getLevel(), calculatedLevel);
+            this.setVariable('level', calculatedLevel);
         }
 
-        this.call("updateRankBar", [requiredExperiences[this.data.currentLevel - 1], requiredExperiences[this.data.currentLevel], prevXP]);
+        this.call("updateRankBar", [requiredExperiences[this.getLevel() - 1], requiredExperiences[this.getLevel()], prevXP]);
     }
-    console.log(`set changexp ran`)
 }
 
 /**
  *  Checks if the player has reached the max level
  */
 mp.Player.prototype.hasReachedMaxLevel = function(){
-    return this.data.currentLevel >= maxLevel && this.data.currentXP >= maxExperience;
+    return this.getLevel() >= maxLevel && this.getXP() >= maxExperience;
 }
 
 /**
@@ -138,6 +142,7 @@ mp.Player.prototype.getGroup = function(){
  *  player.setGroup(255);
  */
 mp.Player.prototype.setGroup = function(groupID){
+    if(isNaN(groupID)) return;
     let targetGroup = server.groups.getGroup(groupID);
     if(targetGroup == undefined) return;
     this.setVariable('group', groupID);
