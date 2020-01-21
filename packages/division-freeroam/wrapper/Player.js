@@ -2,12 +2,8 @@ const requiredExperiences = require("../data/xpdata"); // 8000 levels from GTA O
 const maxLevel = requiredExperiences.length - 1;
 const maxExperience = requiredExperiences[maxLevel];
 
-const clamp = (value, min, max) => {
-    return value <= min ? min : value >= max ? max : value;
-};
-
 const levelFromXP = (xp) => {
-    return clamp(requiredExperiences.findIndex(lvlXP => lvlXP >= xp), 1, maxLevel);
+    return server.utility.clamp(requiredExperiences.findIndex(lvlXP => lvlXP >= xp), 1, maxLevel);
 };
 
 /**
@@ -55,7 +51,7 @@ mp.Player.prototype.setLevel = function(lvl){
     if(isNaN(lvl)) return;
     let newLevel = parseInt(lvl);
     let prevLevel = this.getLevel();
-    this.setVariable('level', clamp(newLevel, 1, maxLevel));
+    this.setVariable('level', server.utility.clamp(newLevel, 1, maxLevel));
 
     if (this.getLevel() != prevLevel) {
         let prevXP = this.getXP();
@@ -77,7 +73,7 @@ mp.Player.prototype.setXP = function(xp){
     if(isNaN(xp)) return;
     let newXP = parseInt(xp);
     let prevXP = this.getXP();
-    this.setVariable('xp', clamp(newXP, 0, maxExperience));
+    this.setVariable('xp', server.utility.clamp(newXP, 0, maxExperience));
 
     if (this.getXP() != prevXP) {
         mp.events.call("playerXPChange", this, prevXP, this.getXP(), this.getXP() - prevXP);
@@ -102,7 +98,7 @@ mp.Player.prototype.changeXP = function(xp){
     if(isNaN(xp)) return;
     let xpAmount = parseInt(xp);
     let prevXP = this.getXP();
-    this.setVariable('xp', clamp(prevXP + xpAmount, 0, maxExperience));
+    this.setVariable('xp', server.utility.clamp(prevXP + xpAmount, 0, maxExperience));
 
     if (this.getXP() != prevXP) {
         mp.events.call("playerXPChange", this, prevXP, this.getXP(), this.getXP() - prevXP);

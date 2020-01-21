@@ -14,6 +14,7 @@ global.server = {};
 const fs = require('fs');
 server.chalk = require('chalk');
 server.logger = require('./logger.js');
+server.utility = require('./utility.js');
 
 require('./wrapper/Player.js');
 require('./components.js');

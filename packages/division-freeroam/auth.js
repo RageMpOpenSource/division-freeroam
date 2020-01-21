@@ -1,13 +1,10 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const spawnPoints = require('./data/PlayerSpawn.json');
-//TEMP, ORGANISE THESE LEVELS BETTER
-const requiredExperiences = require("./data/xpdata"); // 8000 levels from GTA Online - credit: https://pastebin.com/fFkUygTy
+
+const requiredExperiences = require("./data/xpdata");
 const maxLevel = requiredExperiences.length - 1;
 const maxExperience = requiredExperiences[maxLevel];
-const clamp = (value, min, max) => {
-    return value <= min ? min : value >= max ? max : value;
-};
 
 
 mp.events.add("playerReady", async (player) => {
@@ -55,8 +52,8 @@ module.exports = {
             user.setVariable('sqlID', res[0][0].ID);
             user.setVariable('muted', false);
             user.setVariable('prisoned', res[0][0].Prisoned);
-            user.setVariable('level', clamp(res[0][0].Level, 1, maxLevel)); //  Cannot use setLevel() here
-            user.setVariable('xp', clamp(res[0][0].Experience, 0, maxExperience));
+            user.setVariable('level', server.utility.clamp(res[0][0].Level, 1, maxLevel)); //  Cannot use setLevel() here
+            user.setVariable('xp', server.utility.clamp(res[0][0].Experience, 0, maxExperience));
 
             if(res[0][0].Outfit != null){
                 user.loadCharacter();
