@@ -12,6 +12,7 @@ mp.events.add('showLogin', () => {
 mp.events.add('hideLogin', () => {
     loginBrowser.destroy();
     loginBrowser = null;
+    mp.gui.chat.activate(true);
     mp.gui.cursor.show(false, false);
 });
 
