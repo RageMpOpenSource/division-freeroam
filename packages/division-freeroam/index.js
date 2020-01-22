@@ -21,7 +21,7 @@ require('./wrapper/Player.js');
 require('./components.js');
 
 if(!fs.existsSync(`${__dirname}/config.json`)){
-    console.log(`${chalk.red('You do not have a \'config.json\' file setup.')}`);
+    server.logger.error('You do not have a \'config.json\' file setup.');
     process.exit(0);
 } else {
     server.config = require('./config.json');

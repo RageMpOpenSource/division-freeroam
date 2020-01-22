@@ -24,7 +24,7 @@ module.exports = {
                     await server.db.query('INSERT INTO `groups` VALUES (?, ?, ?)', [level, name, 0]).then(() => {
                         server.groupData.push({'ID': level, 'Name': name, 'Protected': 0});
                         player.outputChatBox(`${server.prefix.server} The group ${name} has been created`);
-                    }).catch(err => console.log(`${server.chalk.red(err)}`));
+                    }).catch(err => server.logger.error(err));
                 } else {
                     player.outputChatBox(`${server.prefix.error} A group already exists with that level`);
                 }
@@ -41,7 +41,7 @@ module.exports = {
             await server.db.query('DELETE FROM `groups` WHERE ID = ?', [groupID]).then(() => {
                 server.groupData.splice((server.groupData.findIndex(e => e.ID == groupID)), 1);
                 player.outputChatBox(`${server.prefix.info} ${group.Name} deleted`);
-            }).catch(err => console.log(`${server.chalk.red(err)}`));
+            }).catch(err => server.logger.error(err));
         } catch(e) { console.log(e) };
     },
     getGroup: function(data){

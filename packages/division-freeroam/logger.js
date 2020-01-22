@@ -10,7 +10,16 @@
 
 const winston = require('winston');
 
+const myFormat = winston.format.printf(({ level, message, timestamp }) => {
+  return `[${timestamp}] ${level.toUpperCase()}: ${message}`;
+});
+
 const logger = winston.createLogger({
+    format: winston.format.combine(
+        winston.format.timestamp({format:'HH:mm:ss DD-MM-YYYY'}),
+        winston.format.json(),
+        myFormat
+    ),
     transports: [
         new winston.transports.Console({ level: 'info' }),   //  Put the highest level you want to log
         new winston.transports.File({

@@ -17,7 +17,7 @@ mp.events.add("playerReady", async (player) => {
             server.db.query('INSERT INTO `accounts` (`Identity`) VALUES (?)', [hash]).then(() => {
                 console.log(`${server.chalk.green(player.name)} has just joined for the first time!`);
                 server.auth.loadAccount(player, hash);
-            }).catch(err => console.log(`${server.chalk.red(err)}`));
+            }).catch(err => server.logger.error(err));
         } else {    //  Returning User
             if(res[0].Password != null){
                 player.call('showLogin');
@@ -26,7 +26,7 @@ mp.events.add("playerReady", async (player) => {
                 server.auth.loadAccount(player, hash);
             }
         }
-    }).catch(err => console.log(`${server.chalk.red(err)}`));
+    }).catch(err => server.logger.error(err));
 });
 
 mp.events.add('verifyPassword', async (player, password) => {
@@ -39,8 +39,8 @@ mp.events.add('verifyPassword', async (player, password) => {
             } else {
                 player.call('loginError', ['Incorrect password']);
             }
-        }).catch(err => console.log(`${server.chalk.red(err)}`));; 
-    }).catch(err => console.log(`${server.chalk.red(err)}`));
+        }).catch(err => server.logger.error(err)); 
+    }).catch(err => server.logger.error(err));
 });
 
 module.exports = {
@@ -63,18 +63,18 @@ module.exports = {
                 user.defaultCharacter();    //  Stops error
                 user.sendToCreator();
             }
-        }).catch(err => console.log(`${server.chalk.red(err)}`));
+        }).catch(err => server.logger.error(err));
     },
     changePassword: function(user, password){
         if(password.length <= 5) return user.outputChatBox(`${server.prefix.error} Passwords must be at least 6 characters long`);
         bcrypt.genSalt(10, function(err, salt) {
-            if(err) return console.log(`${chalk.red('[BCrypt Error]')} Issue generating salt.`);
+            if(err) return server.logger.error('Issue generating salt.');
             bcrypt.hash(password, salt, async function(err, hash) {
-                if(err) return console.log(`${chalk.red('[BCrypt Error]')} Issue hashing password.`);
+                if(err) return server.logger.error('Issue hashing password.');
                 await server.db.query('UPDATE `accounts` SET `Password` = ? WHERE `Identity` = ?', [hash, user.identity]).then(() => {
                     console.log(`${user.name} has changed their password.`);
                     user.outputChatBox(`${server.prefix.info} You have successfully changed your password`)
-                }).catch(err => console.log(`${server.chalk.red(err)}`));
+                }).catch(err => server.logger.error(err));
             });
         });
     },

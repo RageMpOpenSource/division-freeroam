@@ -9,28 +9,28 @@ pool.getConnection().then(conn => {
 }).catch(err => {
     switch(err.code){
         case 'PROTOCOL_CONNECTION_LOST':
-            console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: Database connection was closed.')}`);
+            server.logger.error('Database connection was closed.');
             break;
         case 'ER_CON_COUNT_ERROR':
-            console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: Database has too many connections.')}`);
+            server.logger.error('Database has too many connections.');
             break;
         case 'ECONNREFUSED':
-            console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: Check your connection details (packages/swift-core/database.js) or make sure your MySQL server is running.')}`);
+            server.logger.error('Check your connection details (packages/swift-core/database.js) or make sure your MySQL server is running.');
             break;
         case 'ER_BAD_DB_ERROR':
-            console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: The database name you\'ve entered does not exist.')}`);
+            server.logger.error('The database name you\'ve entered does not exist.');
             break;
         case 'ER_ACCESS_DENIED_ERROR':
-            console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: Check your MySQL username and password and make sure they\'re correct.')}`);
+            server.logger.error('Check your MySQL username and password and make sure they\'re correct.');
             break;
         case 'ENOENT':
-            console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: There is no internet connection. Check your connection and try again.')}`);
+            server.logger.error('There is no internet connection. Check your connection and try again.');
             break;
         case 'ENOTFOUND':
-            console.log(`${server.chalk.green('[Database]')} ${server.chalk.red('Error: Database host not found.')}`);
+            server.logger.error('Database host not found.');
             break;
         default:
-            console.log(`${server.chalk.red(err)}`);
+            server.logger.error(err);
             break;
         }
 });

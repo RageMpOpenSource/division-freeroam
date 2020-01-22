@@ -3,5 +3,5 @@ mp.events.add("playerQuit", async (player) => {
     let name = player.name;
     await server.db.query('UPDATE `accounts` SET `Level` = ?, `Experience` = ?, `money` = ?, `group` = ?, `prisoned` = ? WHERE `Identity` = ?', [player.getLevel(), player.getXP(), player.getMoney(), player.getGroup(), player.getVariable('prisoned'), player.identity]).then(() => {
         console.log(`${server.chalk.red(name)} has quit the server.`);
-    }).catch(err => console.log(`Error on Quit: ${server.chalk.red(err)}`));
+    }).catch(err => server.logger.error(`Error on Quit: ${err}`));
 });
