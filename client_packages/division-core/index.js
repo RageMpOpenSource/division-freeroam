@@ -1,6 +1,7 @@
 require('division-core/keybinds.js');
 require('division-core/ui/rage-ui.js');
 require('division-core/auth.js');
+require('division-core/ui/player-list');
 
 let isFrozen = false;
 
