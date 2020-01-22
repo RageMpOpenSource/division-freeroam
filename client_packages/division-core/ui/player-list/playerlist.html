@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="../assets/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../assets/css/style.css">
+    <style>
+        .card {
+            margin-top: 20%;
+            max-width: 800px;
+        }
+        .card-body{
+            padding: 0px;
+        }
+
+        .table {
+            margin-bottom: 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header text-center">
+                Online Players
+            </div>
+            <div class="card-body">
+                <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Level</th>
+                        <th scope="col">Ping</th>
+                      </tr>
+                    </thead>
+                    <tbody id="player-table"></tbody>
+                  </table>
+            </div>
+        </div>
+    </div>
+    <!-- <script src="index.js"></script> -->
+</body>
+</html>

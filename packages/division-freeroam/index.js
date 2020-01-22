@@ -12,6 +12,7 @@ setInterval(()=>{}, 0); //  Used to fix async stuff
 global.server = {};
 
 const fs = require('fs');
+server.rpc = require('rage-rpc');
 server.chalk = require('chalk');
 server.logger = require('./logger.js');
 server.utility = require('./utility.js');
