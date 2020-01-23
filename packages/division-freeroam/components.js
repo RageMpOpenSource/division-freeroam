@@ -10,6 +10,7 @@ server.loadCore = function(){
     require('./charcreator.js');
     require('./commands.js');
     require('./admin.js');
+    require('./gamemodes/index.js');
 }
 
 server.loadModules = function(){

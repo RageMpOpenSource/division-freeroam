@@ -4,13 +4,17 @@
   "description": "Division freeroam info",
   "main": "index.js",
   "dependencies": {
+    "@types/node": "^13.1.8",
     "bcryptjs": "^2.4.3",
     "chalk": "^3.0.0",
     "mysql2": "^2.0.1",
     "rage-rpc": "^0.4.0",
     "winston": "^3.2.1"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/ragemp-c": "github:CocaColaBear/types-ragemp-c#master",
+    "@types/ragemp-s": "github:CocaColaBear/types-ragemp-s#master"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
