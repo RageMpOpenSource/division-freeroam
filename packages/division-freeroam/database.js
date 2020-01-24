@@ -1,13 +1,16 @@
-const pool = require('mysql2/promise').createPool({host: server.config.db_host, user: server.config.db_username, password: server.config.db_password, database: server.config.db_name, connectionLimit: server.config.db_connectionLimit, multipleStatements: true});
+const pool = require('mysql2/promise').createPool({ host: server.config.db_host, user: server.config.db_username, password: server.config.db_password, database: server.config.db_name, connectionLimit: server.config.db_connectionLimit, multipleStatements: true });
 
 pool.getConnection().then(conn => {
     console.log(`${server.chalk.green('[Database]')} Connected successfully.`);
-    server.loadCore();
-    server.loadModules();
-    conn.release();
-    return;
+    server.loadModules()
+        .then(() => {
+            server.loadCore();
+            conn.release();
+            return;
+
+        });
 }).catch(err => {
-    switch(err.code){
+    switch (err.code) {
         case 'PROTOCOL_CONNECTION_LOST':
             server.logger.error('Database connection was closed.');
             break;
@@ -32,7 +35,7 @@ pool.getConnection().then(conn => {
         default:
             server.logger.error(err);
             break;
-        }
+    }
 });
 
 module.exports = pool;

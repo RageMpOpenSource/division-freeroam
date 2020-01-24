@@ -2,7 +2,7 @@ const fs = require('fs')
 const modules = fs.readdirSync(__dirname + '/components').map(moduleName => require(`./components/${moduleName}`))
 server.groups = require('./components/groups.js');
 
-server.loadCore = function(){
+server.loadCore = function () {
     server.auth = require('./auth.js');
     require('./events/playerChat.js');
     require('./events/playerQuit.js');
@@ -13,6 +13,8 @@ server.loadCore = function(){
     require('./gamemodes/index.js');
 }
 
-server.loadModules = function(){
-    Promise.all(modules.map(comp => comp.start())).then(console.log).catch(console.warn);
+server.loadModules = async function () {
+    Promise.all(modules.map(comp => comp.start()))
+        .then(console.log)
+        .catch(console.warn);
 }
