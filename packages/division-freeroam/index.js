@@ -5,6 +5,7 @@
  *  Credits:
  *      +> root [v-cargens](https://github.com/root-cause/v-cargens)
  *              [levels](https://rage.mp/files/file/75-levels/)
+ *              [Inventory-API](https://rage.mp/files/file/172-inventory-api/)
  */
 
 setInterval(()=>{}, 0); //  Used to fix async stuff

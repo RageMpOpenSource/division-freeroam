@@ -4,9 +4,11 @@ server.groups = require('./components/groups.js');
 
 server.loadCore = function(){
     server.auth = require('./auth.js');
+    server.inv = require('./inventory.js');
     require('./events/playerChat.js');
     require('./events/playerQuit.js');
     require('./events/playerDeath.js');
+    require('./events/inventory.js')
     require('./charcreator.js');
     require('./commands.js');
     require('./admin.js');

@@ -54,6 +54,7 @@ module.exports = {
             user.setVariable('prisoned', res[0][0].Prisoned);
             user.setVariable('level', server.utility.clamp(res[0][0].Level, 1, maxLevel)); //  Cannot use setLevel() here
             user.setVariable('xp', server.utility.clamp(res[0][0].Experience, 0, maxExperience));
+            user._inventory = [];
 
             if(res[0][0].Outfit != null){
                 user.loadCharacter();
