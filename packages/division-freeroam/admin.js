@@ -229,6 +229,19 @@ mp.events.addCommand({
         server.auth.spawnPlayer(user);
         user.outputChatBox(`${server.prefix.server} You have been released from jail.`);
     },
+    "giveitem": (player, _, targetID, itemKey, amount) => {
+        if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
+        if(!targetID || !itemKey || !amount) return player.outputChatBox(`${server.prefix.syntax} /giveitem [player_id] [item_name] [amount]`);
+        let user = mp.players.at(targetID);
+        if(user == null) return player.outputChatBox(`${server.prefix.error} Player not found.`);
+        amount = Number(amount);
+    
+        if (user.giveItem(itemKey, amount)) {
+            user.outputChatBox(`Added ${server.inv.getItemName(itemKey)}(${amount}) to your inventory.`);
+        } else {
+            player.outputChatBox(`${server.prefix.error} Failed to give item (${itemKey}).`);
+        }
+    },
     //  Owner Commands (Level 255)
     'setgroup': (player, _, targetID, groupID) => {
         if(player.getGroup() != OWNER_INDEX_START) return player.outputChatBox(server.prefix.permission);
