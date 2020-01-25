@@ -3,6 +3,7 @@ let uiEnabled = false;
 
 mp.events.add('toggleUI', (status) => {
     status ? uiEnabled = true : uiEnabled = false;
+    mp.gui.chat.activate(true);
 });
 
 mp.events.addDataHandler('money', (entity, value) => {
