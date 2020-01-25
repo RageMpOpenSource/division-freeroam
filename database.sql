@@ -15,6 +15,7 @@ CREATE TABLE `division-freeroam`.`accounts` (
     `Outfit` JSON,
     `Money` INT NOT NULL DEFAULT(5000),
     `Prisoned` BOOLEAN NOT NULL DEFAULT 0,
+    `Inventory` MEDIUMTEXT DEFAULT NULL,
     PRIMARY KEY(`ID`)
 );
 
