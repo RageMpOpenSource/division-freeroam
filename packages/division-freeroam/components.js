@@ -5,6 +5,7 @@ server.groups = require('./components/groups.js');
 server.loadCore = function(){
     server.auth = require('./auth.js');
     server.inv = require('./inventory.js');
+    server.items = require('./data/items.js');
     require('./events/playerChat.js');
     require('./events/playerQuit.js');
     require('./events/playerDeath.js');

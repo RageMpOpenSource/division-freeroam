@@ -21,6 +21,12 @@ mp.events.addCommand("inventory", (player) => {
 
     player.outputChatBox("Your inventory:");
     inventory.forEach((item, index) => {
-        player.outputChatBox(`${index} | ${server.inv.getItemName(item.key)} (${item.key}) | ${item.amount}x`);
+        player.outputChatBox(`${index} | ${server.inv.getItemName(item.key)}[x${item.amount}]`);
     });
+});
+
+mp.events.addCommand("useitem", (player, _, itemIndex) => {
+    itemIndex = Number(itemIndex);
+
+    player.useItem(itemIndex)
 });
