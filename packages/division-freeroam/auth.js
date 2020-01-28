@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
-const spawnPoints = require('./data/PlayerSpawn.json');
+const spawnPoints = require('./data/SpawnLocations.json');
 
 const requiredExperiences = require("./data/xpdata");
 const maxLevel = requiredExperiences.length - 1;
@@ -54,6 +54,8 @@ module.exports = {
             user.setVariable('prisoned', res[0][0].Prisoned);
             user.setVariable('level', server.utility.clamp(res[0][0].Level, 1, maxLevel)); //  Cannot use setLevel() here
             user.setVariable('xp', server.utility.clamp(res[0][0].Experience, 0, maxExperience));
+            user.setVariable('kills', res[0][0].Kills);
+            user.setVariable('deaths', res[0][0].Deaths);
 
             if(res[0][0].Outfit != null){
                 user.loadCharacter();
@@ -83,8 +85,11 @@ module.exports = {
             user.spawn(new mp.Vector3(459.89, -1001.46, 24.91));
             user.dimension = 0;
             user.outputChatBox(`${server.prefix.server} You have spawned in admin jail as you were prisoned during your last session`);
+        } else if(user.getVariable('isDead') == true){
+            user.setVariable('isDead', false);
+            user.spawn(spawnPoints.Hospital[Math.floor(Math.random() * spawnPoints.Hospital.length)]);
         } else {
-            user.spawn(spawnPoints.Locations[Math.floor(Math.random() * spawnPoints.Locations.length) + 1]);
+            user.spawn(spawnPoints.Locations[Math.floor(Math.random() * spawnPoints.Locations.length)]);
         }
     }
 }

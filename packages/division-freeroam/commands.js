@@ -1,5 +1,5 @@
 mp.events.addCommand('stats', (player) => {
-    player.outputChatBox(`Level: ${player.getLevel()}, Money: ${player.getMoney()}, Group: ${player.getGroup()}`)
+    player.outputChatBox(`Level: ${player.getLevel()}, Money: ${player.getMoney()}, Group: ${player.getGroup()}, Kills: ${player.getVariable('kills')}, Deaths: ${player.getVariable('deaths')}`);
 });
 
 mp.events.addCommand('updatemoney', (player, amount) => {
