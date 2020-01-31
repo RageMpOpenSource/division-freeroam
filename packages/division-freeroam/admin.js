@@ -175,6 +175,15 @@ mp.events.addCommand({
         player.outputChatBox(`Health: [${user.health}], Armour: [${user.armour}] Social Club: [${user.socialClub}]`);
         player.outputChatBox('===========[ Lookup Info ]===========');
     },
+    'sqllookup': async(player, sqlID) => {
+        if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
+        if(!sqlID) return player.outputChatBox(`${server.prefix.syntax} /sqllookup [sql_id]`);
+        await server.db.query('SELECT `ID`, `Username`, `LastActive`, `Level`, `Kills`, `Deaths` FROM `accounts` WHERE `ID` = ?', [sqlID]).then(([res]) => {
+            if(res.length === 0) return player.outputChatBox(`${server.prefix.error} No user found with that SQL ID`);
+            player.outputChatBox(`ID: ${res[0].ID}, Username: ${res[0].Username}, Last Active: ${res[0].LastActive}, Level: ${res[0].Level}, Kills: ${res[0].Kills}, Deaths: ${res[0].Deaths}`)
+            console.log(`Res: ${JSON.stringify(res.length)}`);
+        }).catch(err => server.logger.error(err));;
+    },
     'weapon': (player, weapon_model) => {
         if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
         if(!weapon_model) return player.outputChatBox(`${server.prefix.syntax} /weapon [weapon_model]`);

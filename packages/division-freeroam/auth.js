@@ -15,7 +15,7 @@ mp.events.add("playerReady", async (player) => {
     await server.db.query('SELECT `ID`, `Identity`, `Password` FROM `accounts` WHERE `Identity` = ?', [hash]).then(([res]) => {
         player.identity = hash;
         server.db.query('SELECT `sqlID`, `unbanDate`, `reason` FROM `bans` WHERE `sqlID` = ?', [res[0].ID]).then(([rows]) => {
-            if(rows.length == 0){   //  Results found = player banned
+            if(rows.length != 0){   //  Results found = player banned
                 player.outputChatBox(`${server.prefix.server} You are currently banned from the server. Unban date: ${rows[0].unbanDate}`)
                 player.outputChatBox(`${server.prefix.server} Reason: ${rows[0].reason}`);
                 player.kick();
