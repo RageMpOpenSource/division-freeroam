@@ -10,22 +10,31 @@ const maxExperience = requiredExperiences[maxLevel];
 mp.events.add("playerReady", async (player) => {
     let user = `${player.socialClub}#${player.serial}`; //  Change to rsscid 1.0
     let hash = crypto.createHash('md5').update(user).digest('hex');
+    player.setVariable('loggedIn', false);
 
-    await server.db.query('SELECT `Identity`, `Password` FROM `accounts` WHERE `Identity` = ?', [hash]).then(([res]) => {
+    await server.db.query('SELECT `ID`, `Identity`, `Password` FROM `accounts` WHERE `Identity` = ?', [hash]).then(([res]) => {
         player.identity = hash;
-        if(res.length === 0){   //  New User
-            server.db.query('INSERT INTO `accounts` (`Identity`) VALUES (?)', [hash]).then(() => {
-                console.log(`${server.chalk.green(player.name)} has just joined for the first time!`);
-                server.auth.loadAccount(player, hash);
-            }).catch(err => server.logger.error(err));
-        } else {    //  Returning User
-            if(res[0].Password != null){
-                player.call('showLogin');
+        server.db.query('SELECT `sqlID`, `unbanDate`, `reason` FROM `bans` WHERE `sqlID` = ?', [res[0].ID]).then(([rows]) => {
+            if(rows.length != 0){   //  Results found = player banned
+                player.outputChatBox(`${server.prefix.server} You are currently banned from the server. Unban date: ${rows[0].unbanDate}`)
+                player.outputChatBox(`${server.prefix.server} Reason: ${rows[0].reason}`);
+                player.kick();
             } else {
-                console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
-                server.auth.loadAccount(player, hash);
+                if(res.length === 0){   //  New User
+                    server.db.query('INSERT INTO `accounts` (`Identity`) VALUES (?)', [hash]).then(() => {
+                        console.log(`${server.chalk.green(player.name)} has just joined for the first time!`);
+                        server.auth.loadAccount(player, hash);
+                    }).catch(err => server.logger.error(err));
+                } else {    //  Returning User
+                    if(res[0].Password != null){
+                        player.call('showLogin');
+                    } else {
+                        console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
+                        server.auth.loadAccount(player, hash);
+                    }
+                }
             }
-        }
+        }).catch(err => server.logger.error(err));
     }).catch(err => server.logger.error(err));
 });
 
@@ -57,6 +66,7 @@ module.exports = {
             user.setVariable('kills', res[0][0].Kills);
             user.setVariable('deaths', res[0][0].Deaths);
 
+            player.setVariable('loggedIn', true);
             if(res[0][0].Outfit != null){
                 user.loadCharacter();
                 user.call('toggleUI', [true]);

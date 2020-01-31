@@ -229,6 +229,31 @@ mp.events.addCommand({
         server.auth.spawnPlayer(user);
         user.outputChatBox(`${server.prefix.server} You have been released from jail.`);
     },
+    'pban': (player, _, targetID, reason) => {
+
+    },
+    'ban': async (player, _, sqlID, days, ...reason) => {
+        if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
+        if(!sqlID || !days || reason.length === 0) return player.outputChatBox(`${server.prefix.syntax} /ban [sql_id] [days] [reason]`);
+        let reasonString = reason.join(' ');
+        await server.db.query('SELECT `ID` FROM `accounts` WHERE `ID` = ?', [sqlID]).then(([res]) => {
+            return res;
+        }).then(function(result){
+            if(result.length === 0) return player.outputChatBox(`${server.prefix.error} No player with that SQL ID exists.`);
+            server.db.query("INSERT INTO `bans` (`sqlID`, `unbanDate`, `reason`) VALUES (?, (now() + INTERVAL ? DAY), ?)", [sqlID, days, reasonString]).then(() => {
+                player.outputChatBox(`${server.prefix.server} Player with the SQL ID of ${sqlID} has been banned for ${days} days.`);
+                mp.players.forEach(function(user){
+                    if(user.getVariable('sqlID') == sqlID){
+                        user.outputChatBox(`${server.prefix.server} You have been banned from the server.`);
+                        user.kick();
+                    }
+                });
+            }).catch(err => server.logger.error(err));
+        }).catch(err => server.logger.error(err));
+    },
+    'unban': (player, sqlID) => {
+        //  Have to use their sqlID to unban them
+    },
     //  Owner Commands (Level 255)
     'setgroup': (player, _, targetID, groupID) => {
         if(player.getGroup() != OWNER_INDEX_START) return player.outputChatBox(server.prefix.permission);

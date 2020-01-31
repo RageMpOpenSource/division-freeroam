@@ -20,6 +20,15 @@ CREATE TABLE `division-freeroam`.`accounts` (
     PRIMARY KEY(`ID`)
 );
 
+DROP TABLE IF EXISTS `division-freeroam`.`bans`;
+CREATE TABLE `division-freeroam`.`bans` (
+  `sqlID` INT NOT NULL,
+  `banDate` DATETIME DEFAULT NOW(),
+  `unbanDate` DATETIME NOT NULL,
+  `Reason` VARCHAR(250) NOT NULL,
+  PRIMARY KEY(`sqlID`)
+);
+
 DROP TABLE IF EXISTS `division-freeroam`.`groups`;
 CREATE TABLE `division-freeroam`.`groups` (
   `ID` tinyint UNSIGNED NOT NULL,
