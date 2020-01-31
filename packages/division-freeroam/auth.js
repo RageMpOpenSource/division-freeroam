@@ -15,7 +15,7 @@ mp.events.add("playerReady", async (player) => {
     await server.db.query('SELECT `ID`, `Identity`, `Password` FROM `accounts` WHERE `Identity` = ?', [hash]).then(([res]) => {
         player.identity = hash;
         server.db.query('SELECT `sqlID`, `unbanDate`, `reason` FROM `bans` WHERE `sqlID` = ?', [res[0].ID]).then(([rows]) => {
-            if(rows.length != 0){   //  Results found = player banned
+            if(rows.length == 0){   //  Results found = player banned
                 player.outputChatBox(`${server.prefix.server} You are currently banned from the server. Unban date: ${rows[0].unbanDate}`)
                 player.outputChatBox(`${server.prefix.server} Reason: ${rows[0].reason}`);
                 player.kick();
@@ -58,7 +58,7 @@ module.exports = {
             if(res[0][0].Username != null) user.name = res[0][0].Username;
             user.setMoney(res[0][0].Money);
             user.setGroup(res[0][0].Group)
-            user.setVariable('sqlID', res[0][0].ID);
+            user.sqlID = res[0][0].ID;
             user.setVariable('muted', false);
             user.setVariable('prisoned', res[0][0].Prisoned);
             user.setVariable('level', server.utility.clamp(res[0][0].Level, 1, maxLevel)); //  Cannot use setLevel() here
@@ -66,7 +66,7 @@ module.exports = {
             user.setVariable('kills', res[0][0].Kills);
             user.setVariable('deaths', res[0][0].Deaths);
 
-            player.setVariable('loggedIn', true);
+            user.setVariable('loggedIn', true);
             if(res[0][0].Outfit != null){
                 user.loadCharacter();
                 user.call('toggleUI', [true]);

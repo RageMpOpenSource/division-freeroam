@@ -171,7 +171,7 @@ mp.events.addCommand({
         let user = mp.players.at(targetID);
         if(user == null) return player.outputChatBox(`${server.prefix.error} Player not found.`);
         player.outputChatBox('===========[ Lookup Info ]===========');
-        player.outputChatBox(`SQLID: [${user.getVariable('sqlID')}] Username: [${user.name}], IP: [${user.ip}] Group: [${user.getGroup()}], Money: [${player.getMoney()}]`);
+        player.outputChatBox(`SQLID: [${user.sqlID}] Username: [${user.name}], IP: [${user.ip}] Group: [${user.getGroup()}], Money: [${player.getMoney()}]`);
         player.outputChatBox(`Health: [${user.health}], Armour: [${user.armour}] Social Club: [${user.socialClub}]`);
         player.outputChatBox('===========[ Lookup Info ]===========');
     },
@@ -243,7 +243,7 @@ mp.events.addCommand({
             server.db.query("INSERT INTO `bans` (`sqlID`, `unbanDate`, `reason`) VALUES (?, (now() + INTERVAL ? DAY), ?)", [sqlID, days, reasonString]).then(() => {
                 player.outputChatBox(`${server.prefix.server} Player with the SQL ID of ${sqlID} has been banned for ${days} days.`);
                 mp.players.forEach(function(user){
-                    if(user.getVariable('sqlID') == sqlID){
+                    if(user.sqlID == sqlID){
                         user.outputChatBox(`${server.prefix.server} You have been banned from the server.`);
                         user.kick();
                     }
@@ -251,8 +251,13 @@ mp.events.addCommand({
             }).catch(err => server.logger.error(err));
         }).catch(err => server.logger.error(err));
     },
-    'unban': (player, sqlID) => {
-        //  Have to use their sqlID to unban them
+    'unban': async (player, sqlID) => {
+        if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
+        if(!sqlID) return player.outputChatBox(`${server.prefix.syntax} /unban [sql_id]`);
+        await server.db.query('DELETE FROM `bans` WHERE `sqlID` = ?', [sqlID]).then(([res]) => {
+            if(res.affectedRows === 0) return player.outputChatBox(`${server.prefix.error} No user with that SQL ID is currently banned`);
+            player.outputChatBox(`${server.prefix.info} Player with the SQL ID ${sqlID} is now unbanned`);
+        }).catch(err => server.logger.error(err));
     },
     //  Owner Commands (Level 255)
     'setgroup': (player, _, targetID, groupID) => {
