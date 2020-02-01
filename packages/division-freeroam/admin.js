@@ -180,8 +180,8 @@ mp.events.addCommand({
         if(!sqlID) return player.outputChatBox(`${server.prefix.syntax} /sqllookup [sql_id]`);
         await server.db.query('SELECT `ID`, `Username`, `LastActive`, `Level`, `Kills`, `Deaths` FROM `accounts` WHERE `ID` = ?', [sqlID]).then(([res]) => {
             if(res.length === 0) return player.outputChatBox(`${server.prefix.error} No user found with that SQL ID`);
-            player.outputChatBox(`ID: ${res[0].ID}, Username: ${res[0].Username}, Last Active: ${res[0].LastActive}, Level: ${res[0].Level}, Kills: ${res[0].Kills}, Deaths: ${res[0].Deaths}`)
-            console.log(`Res: ${JSON.stringify(res.length)}`);
+            let d = new Date(res[0].LastActive);
+            player.outputChatBox(`ID: ${res[0].ID}, Username: ${res[0].Username}, Last Active: ${d.toGMTString()}, Level: ${res[0].Level}, Kills: ${res[0].Kills}, Deaths: ${res[0].Deaths}`)
         }).catch(err => server.logger.error(err));;
     },
     'weapon': (player, weapon_model) => {
@@ -238,27 +238,17 @@ mp.events.addCommand({
         server.auth.spawnPlayer(user);
         user.outputChatBox(`${server.prefix.server} You have been released from jail.`);
     },
-    'pban': (player, _, targetID, reason) => {
-
+    'pban': (player, _, sqlID, ...reason) => {
+        if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
+        if(!sqlID || reason.length === 0) return player.outputChatBox(`${server.prefix.syntax} /pban [sql_id] [reason]`);
+        let reasonString = reason.join(' ');
+        banAccount(player, sqlID, 3650, reasonString);
     },
-    'ban': async (player, _, sqlID, days, ...reason) => {
+    'ban': (player, _, sqlID, days, ...reason) => {
         if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
         if(!sqlID || !days || reason.length === 0) return player.outputChatBox(`${server.prefix.syntax} /ban [sql_id] [days] [reason]`);
         let reasonString = reason.join(' ');
-        await server.db.query('SELECT `ID` FROM `accounts` WHERE `ID` = ?', [sqlID]).then(([res]) => {
-            return res;
-        }).then(function(result){
-            if(result.length === 0) return player.outputChatBox(`${server.prefix.error} No player with that SQL ID exists.`);
-            server.db.query("INSERT INTO `bans` (`sqlID`, `unbanDate`, `reason`) VALUES (?, (now() + INTERVAL ? DAY), ?)", [sqlID, days, reasonString]).then(() => {
-                player.outputChatBox(`${server.prefix.server} Player with the SQL ID of ${sqlID} has been banned for ${days} days.`);
-                mp.players.forEach(function(user){
-                    if(user.sqlID == sqlID){
-                        user.outputChatBox(`${server.prefix.server} You have been banned from the server.`);
-                        user.kick();
-                    }
-                });
-            }).catch(err => server.logger.error(err));
-        }).catch(err => server.logger.error(err));
+        banAccount(player, sqlID, days, reasonString);
     },
     'unban': async (player, sqlID) => {
         if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
@@ -325,4 +315,21 @@ function teleportToLocation(player, x, y, z){
     let pos = new mp.Vector3(x, y, z);
     if(player.vehicle) return player.vehicle.position = pos;
     player.position = pos;
+}
+
+async function banAccount(player, sqlID, days, reasonString){
+    await server.db.query('SELECT `ID` FROM `accounts` WHERE `ID` = ?', [sqlID]).then(([res]) => {
+        return res;
+    }).then(function(result){
+        if(result.length === 0) return player.outputChatBox(`${server.prefix.error} No player with that SQL ID exists.`);
+        server.db.query("INSERT INTO `bans` (`sqlID`, `unbanDate`, `reason`) VALUES (?, (now() + INTERVAL ? DAY), ?)", [sqlID, days, reasonString]).then(() => {
+            player.outputChatBox(`${server.prefix.server} Player with the SQL ID of ${sqlID} has been banned.`);
+            mp.players.forEach(function(user){
+                if(user.sqlID == sqlID){
+                    user.outputChatBox(`${server.prefix.server} You have been banned from the server.`);
+                    user.kick();
+                }
+            });
+        }).catch(err => server.logger.error(err));
+    }).catch(err => server.logger.error(err));
 }
