@@ -216,15 +216,14 @@ mp.events.addCommand({
     },
     'jail': (player, _, targetID, ...reason) => {
         if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
-        if(!targetID || !reason) return player.outputChatBox(`${server.prefix.syntax} /ajail [player_id] [reason]`);
+        if(!targetID || !reason) return player.outputChatBox(`${server.prefix.syntax} /jail [player_id] [reason]`);
         let user = mp.players.at(targetID);
         if(user == null) return player.outputChatBox(`${server.prefix.error} Player not found.`);
         if(user.getGroup() > 0) return player.outputChatBox(`${server.prefix.error} You cannot jail another administrator.`);
 
         let reasonMsg = reason.join(' ');
-        user.dimension = 123456;
-        user.position = new mp.Vector3(459.89, -1001.46, 24.91);
-        user.setVariable('prisoned', 1);
+        user.setVariable('jailTime', 10);
+        server.auth.spawnPlayerJail(user);
         user.outputChatBox(`${server.prefix.server} You have been jailed by an administrator. Reason: ${reasonMsg}`);
     },
     'jailrelease': (player, _, targetID) => {
@@ -232,9 +231,9 @@ mp.events.addCommand({
         if(!targetID) return player.outputChatBox(`${server.prefix.syntax} /jailrelease [player_id]`);
         let user = mp.players.at(targetID);
         if(user == null) return player.outputChatBox(`${server.prefix.error} Player not found.`);
-        if(user.getVariable('prisoned') == 0) return player.outputChatBox(`${server.prefix.error} That player is not currently jailed`);
+        if(user.getVariable('jailTime') == 0) return player.outputChatBox(`${server.prefix.error} That player is not currently jailed`);
 
-        user.setVariable('prisoned', 0);
+        user.setVariable('jailTime', 0);
         server.auth.spawnPlayer(user);
         user.outputChatBox(`${server.prefix.server} You have been released from jail.`);
     },
