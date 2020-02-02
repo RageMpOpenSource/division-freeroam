@@ -9,15 +9,24 @@ CREATE TABLE `division-freeroam`.`accounts` (
     `RegDate` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `LastActive` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `Password` VARCHAR(60),
-    `Level` smallint(6) UNSIGNED NOT NULL DEFAULT 1,
-    `Experience` int(11) UNSIGNED NOT NULL DEFAULT 0,
-    `Group` tinyint UNSIGNED NOT NULL DEFAULT 0,
+    `Level` SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+    `Experience` INT UNSIGNED NOT NULL DEFAULT 0,
+    `Group` TINYINT UNSIGNED NOT NULL DEFAULT 0,
     `Outfit` JSON,
     `Money` INT NOT NULL DEFAULT(5000),
-    `Prisoned` BOOLEAN NOT NULL DEFAULT 0,
+    `JailTime` TINYINT NOT NULL DEFAULT 0,
     `Kills` INT NOT NULL DEFAULT(0),
     `Deaths` INT NOT NULL DEFAULT(0),
     PRIMARY KEY(`ID`)
+);
+
+DROP TABLE IF EXISTS `division-freeroam`.`bans`;
+CREATE TABLE `division-freeroam`.`bans` (
+  `sqlID` INT NOT NULL,
+  `banDate` DATETIME DEFAULT NOW(),
+  `unbanDate` DATETIME NOT NULL,
+  `Reason` VARCHAR(250) NOT NULL,
+  PRIMARY KEY(`sqlID`)
 );
 
 DROP TABLE IF EXISTS `division-freeroam`.`groups`;

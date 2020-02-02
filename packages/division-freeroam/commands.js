@@ -13,5 +13,6 @@ mp.events.addCommand('groups', (player) => {
 });
 
 mp.events.addCommand('changepass', (player, password) => {
+    if(!password) return player.outputChatBox(`${server.prefix.syntax} /changepass [password]`)
     server.auth.changePassword(player, password);
 });

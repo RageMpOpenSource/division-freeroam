@@ -10,8 +10,9 @@ const maxExperience = requiredExperiences[maxLevel];
 mp.events.add("playerReady", async (player) => {
     let user = `${player.socialClub}#${player.serial}`; //  Change to rsscid 1.0
     let hash = crypto.createHash('md5').update(user).digest('hex');
+    player.setVariable('loggedIn', false);
 
-    await server.db.query('SELECT `Identity`, `Password` FROM `accounts` WHERE `Identity` = ?', [hash]).then(([res]) => {
+    await server.db.query('SELECT `ID`, `Identity`, `Password` FROM `accounts` WHERE `Identity` = ?', [hash]).then(([res]) => {
         player.identity = hash;
         if(res.length === 0){   //  New User
             server.db.query('INSERT INTO `accounts` (`Identity`) VALUES (?)', [hash]).then(() => {
@@ -19,12 +20,32 @@ mp.events.add("playerReady", async (player) => {
                 server.auth.loadAccount(player, hash);
             }).catch(err => server.logger.error(err));
         } else {    //  Returning User
-            if(res[0].Password != null){
-                player.call('showLogin');
-            } else {
-                console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
-                server.auth.loadAccount(player, hash);
-            }
+            server.db.query('SELECT `sqlID`, `unbanDate`, `reason` FROM `bans` WHERE `sqlID` = ?; SELECT `unbanDate` FROM `bans` WHERE `sqlID` = ? AND `unbanDate` > NOW();', [res[0].ID, res[0].ID]).then(([rows]) => {
+                if(rows[0].length != 0){   //  Results found = player banned
+                    if(rows[1].length === 0){   //  Unban date is after today
+                        server.db.query('DELETE FROM `bans` WHERE `sqlID` = ?', [res[0].ID]).then(() => {
+                            if(res[0].Password != null){
+                                player.call('showLogin');
+                            } else {
+                                console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
+                                server.auth.loadAccount(player, hash);
+                            }
+                        });
+                    } else {    //  Unban date is still ahead
+                        let d = new Date(rows[0][0].unbanDate);
+                        player.outputChatBox(`${server.prefix.server} You are currently banned from the server. Unban date: ${d.toGMTString()}`)
+                        player.outputChatBox(`${server.prefix.server} Reason: ${rows[0][0].reason}`);
+                        player.kick();
+                    }
+                } else {    //  No ban results found
+                    if(res[0].Password != null){
+                        player.call('showLogin');
+                    } else {
+                        console.log(`${server.chalk.green(player.name)} has joined the server. [${player.ip}]`);
+                        server.auth.loadAccount(player, hash);
+                    }
+                }
+            }).catch(err => server.logger.error(err));
         }
     }).catch(err => server.logger.error(err));
 });
@@ -49,14 +70,15 @@ module.exports = {
             if(res[0][0].Username != null) user.name = res[0][0].Username;
             user.setMoney(res[0][0].Money);
             user.setGroup(res[0][0].Group)
-            user.setVariable('sqlID', res[0][0].ID);
+            user.sqlID = res[0][0].ID;
             user.setVariable('muted', false);
-            user.setVariable('prisoned', res[0][0].Prisoned);
+            user.setVariable('jailTime', res[0][0].JailTime);
             user.setVariable('level', server.utility.clamp(res[0][0].Level, 1, maxLevel)); //  Cannot use setLevel() here
             user.setVariable('xp', server.utility.clamp(res[0][0].Experience, 0, maxExperience));
             user.setVariable('kills', res[0][0].Kills);
             user.setVariable('deaths', res[0][0].Deaths);
 
+            user.setVariable('loggedIn', true);
             if(res[0][0].Outfit != null){
                 user.loadCharacter();
                 user.call('toggleUI', [true]);
@@ -81,15 +103,30 @@ module.exports = {
         });
     },
     spawnPlayer: function(user){
-        if(user.getVariable('prisoned') == 1){
-            user.spawn(new mp.Vector3(459.89, -1001.46, 24.91));
-            user.dimension = 0;
-            user.outputChatBox(`${server.prefix.server} You have spawned in admin jail as you were prisoned during your last session`);
+        if(user.getVariable('jailTime') > 0){
+            server.auth.spawnPlayerJail(user);
         } else if(user.getVariable('isDead') == true){
             user.setVariable('isDead', false);
             user.spawn(spawnPoints.Hospital[Math.floor(Math.random() * spawnPoints.Hospital.length)]);
         } else {
             user.spawn(spawnPoints.Locations[Math.floor(Math.random() * spawnPoints.Locations.length)]);
+        }
+    },
+    spawnPlayerJail: function(user){
+        let jailTime = user.getVariable('jailTime');
+        user.dimension = 123456;
+        user.spawn(new mp.Vector3(459.89, -1001.46, 24.91));
+        if(!user.jailTimer){
+            user.jailTimer = setInterval(() => {
+                if(jailTime === 0) {
+                    user.outputChatBox(`${server.prefix.server} You have been released from prison.`);
+                    server.auth.spawnPlayer(user);
+                    clearInterval(user.jailTimer);
+                } else {
+                    jailTime -= 1;
+                    user.setVariable('jailTime', jailTime);
+                }
+            }, 60000);
         }
     }
 }

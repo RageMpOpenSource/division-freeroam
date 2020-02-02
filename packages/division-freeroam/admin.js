@@ -171,9 +171,18 @@ mp.events.addCommand({
         let user = mp.players.at(targetID);
         if(user == null) return player.outputChatBox(`${server.prefix.error} Player not found.`);
         player.outputChatBox('===========[ Lookup Info ]===========');
-        player.outputChatBox(`SQLID: [${user.getVariable('sqlID')}] Username: [${user.name}], IP: [${user.ip}] Group: [${user.getGroup()}], Money: [${player.getMoney()}]`);
+        player.outputChatBox(`SQLID: [${user.sqlID}] Username: [${user.name}], IP: [${user.ip}] Group: [${user.getGroup()}], Money: [${player.getMoney()}]`);
         player.outputChatBox(`Health: [${user.health}], Armour: [${user.armour}] Social Club: [${user.socialClub}]`);
         player.outputChatBox('===========[ Lookup Info ]===========');
+    },
+    'sqllookup': async(player, sqlID) => {
+        if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
+        if(!sqlID) return player.outputChatBox(`${server.prefix.syntax} /sqllookup [sql_id]`);
+        await server.db.query('SELECT `ID`, `Username`, `LastActive`, `Level`, `Kills`, `Deaths` FROM `accounts` WHERE `ID` = ?', [sqlID]).then(([res]) => {
+            if(res.length === 0) return player.outputChatBox(`${server.prefix.error} No user found with that SQL ID`);
+            let d = new Date(res[0].LastActive);
+            player.outputChatBox(`ID: ${res[0].ID}, Username: ${res[0].Username}, Last Active: ${d.toGMTString()}, Level: ${res[0].Level}, Kills: ${res[0].Kills}, Deaths: ${res[0].Deaths}`)
+        }).catch(err => server.logger.error(err));;
     },
     'weapon': (player, weapon_model) => {
         if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
@@ -207,15 +216,14 @@ mp.events.addCommand({
     },
     'jail': (player, _, targetID, ...reason) => {
         if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
-        if(!targetID || !reason) return player.outputChatBox(`${server.prefix.syntax} /ajail [player_id] [reason]`);
+        if(!targetID || !reason) return player.outputChatBox(`${server.prefix.syntax} /jail [player_id] [reason]`);
         let user = mp.players.at(targetID);
         if(user == null) return player.outputChatBox(`${server.prefix.error} Player not found.`);
         if(user.getGroup() > 0) return player.outputChatBox(`${server.prefix.error} You cannot jail another administrator.`);
 
         let reasonMsg = reason.join(' ');
-        user.dimension = 123456;
-        user.position = new mp.Vector3(459.89, -1001.46, 24.91);
-        user.setVariable('prisoned', 1);
+        user.setVariable('jailTime', 10);
+        server.auth.spawnPlayerJail(user);
         user.outputChatBox(`${server.prefix.server} You have been jailed by an administrator. Reason: ${reasonMsg}`);
     },
     'jailrelease': (player, _, targetID) => {
@@ -223,11 +231,31 @@ mp.events.addCommand({
         if(!targetID) return player.outputChatBox(`${server.prefix.syntax} /jailrelease [player_id]`);
         let user = mp.players.at(targetID);
         if(user == null) return player.outputChatBox(`${server.prefix.error} Player not found.`);
-        if(user.getVariable('prisoned') == 0) return player.outputChatBox(`${server.prefix.error} That player is not currently jailed`);
+        if(user.getVariable('jailTime') == 0) return player.outputChatBox(`${server.prefix.error} That player is not currently jailed`);
 
-        user.setVariable('prisoned', 0);
+        user.setVariable('jailTime', 0);
         server.auth.spawnPlayer(user);
         user.outputChatBox(`${server.prefix.server} You have been released from jail.`);
+    },
+    'pban': (player, _, sqlID, ...reason) => {
+        if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
+        if(!sqlID || reason.length === 0) return player.outputChatBox(`${server.prefix.syntax} /pban [sql_id] [reason]`);
+        let reasonString = reason.join(' ');
+        banAccount(player, sqlID, 3650, reasonString);
+    },
+    'ban': (player, _, sqlID, days, ...reason) => {
+        if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
+        if(!sqlID || !days || reason.length === 0) return player.outputChatBox(`${server.prefix.syntax} /ban [sql_id] [days] [reason]`);
+        let reasonString = reason.join(' ');
+        banAccount(player, sqlID, days, reasonString);
+    },
+    'unban': async (player, sqlID) => {
+        if(player.getGroup() < ADMIN_INDEX_START) return player.outputChatBox(`${server.prefix.permission}`);
+        if(!sqlID) return player.outputChatBox(`${server.prefix.syntax} /unban [sql_id]`);
+        await server.db.query('DELETE FROM `bans` WHERE `sqlID` = ?', [sqlID]).then(([res]) => {
+            if(res.affectedRows === 0) return player.outputChatBox(`${server.prefix.error} No user with that SQL ID is currently banned`);
+            player.outputChatBox(`${server.prefix.info} Player with the SQL ID ${sqlID} is now unbanned`);
+        }).catch(err => server.logger.error(err));
     },
     //  Owner Commands (Level 255)
     'setgroup': (player, _, targetID, groupID) => {
@@ -286,4 +314,21 @@ function teleportToLocation(player, x, y, z){
     let pos = new mp.Vector3(x, y, z);
     if(player.vehicle) return player.vehicle.position = pos;
     player.position = pos;
+}
+
+async function banAccount(player, sqlID, days, reasonString){
+    await server.db.query('SELECT `ID` FROM `accounts` WHERE `ID` = ?', [sqlID]).then(([res]) => {
+        return res;
+    }).then(function(result){
+        if(result.length === 0) return player.outputChatBox(`${server.prefix.error} No player with that SQL ID exists.`);
+        server.db.query("INSERT INTO `bans` (`sqlID`, `unbanDate`, `reason`) VALUES (?, (now() + INTERVAL ? DAY), ?)", [sqlID, days, reasonString]).then(() => {
+            player.outputChatBox(`${server.prefix.server} Player with the SQL ID of ${sqlID} has been banned.`);
+            mp.players.forEach(function(user){
+                if(user.sqlID == sqlID){
+                    user.outputChatBox(`${server.prefix.server} You have been banned from the server.`);
+                    user.kick();
+                }
+            });
+        }).catch(err => server.logger.error(err));
+    }).catch(err => server.logger.error(err));
 }
