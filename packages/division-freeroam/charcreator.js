@@ -116,10 +116,6 @@ mp.events.add("playerJoin", (player) => {
     };
 
     player.sendToCreator = function() {
-        player.preCreatorPos = player.position;
-        player.preCreatorHeading = player.heading;
-        player.preCreatorDimension = player.dimension;
-
         player.position = creatorPlayerPos;
         player.heading = creatorPlayerHeading;
         player.dimension = creatorDimension;
@@ -131,13 +127,11 @@ mp.events.add("playerJoin", (player) => {
     };
 
     player.sendToWorld = function() {
-        player.position = player.preCreatorPos;
-        player.heading = player.preCreatorHeading;
-        player.dimension = player.preCreatorDimension;
         player.usingCreator = false;
         player.changedGender = false;
         player.call("toggleCreator", [false]);
         player.call('toggleUI', [true]);
+        server.auth.spawnPlayer(player);
     };
 });
 
