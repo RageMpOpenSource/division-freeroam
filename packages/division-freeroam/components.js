@@ -4,6 +4,7 @@ server.groups = require('./components/groups.js');
 
 server.loadCore = function(){
     server.auth = require('./auth.js');
+    server.time = require('./time.js');
     require('./events/playerChat.js');
     require('./events/playerQuit.js');
     require('./events/playerDeath.js');
