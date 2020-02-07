@@ -16,3 +16,8 @@ mp.events.addCommand('changepass', (player, password) => {
     if(!password) return player.outputChatBox(`${server.prefix.syntax} /changepass [password]`)
     server.auth.changePassword(player, password);
 });
+
+mp.events.addCommand('time', (player) => {
+    let time = server.time.getTime();
+    player.outputChatBox(`The time is: ${time}`);
+})
