@@ -1,36 +1,35 @@
-/**
- *  Logging levels used
- *  error: 0
- *  warn: 1
- *  info: 2
- *  verbose: 3
- *  debug: 4
- *  silly: 5
- */
+//  Credits: https://tutorialedge.net/nodejs/writing-your-own-logging-system-nodejs/
+const fs = require("fs");
 
-const winston = require('winston');
+let Logger = {};
 
-const myFormat = winston.format.printf(({ level, message, timestamp }) => {
-  return `[${timestamp}] ${level.toUpperCase()}: ${message}`;
-});
+let infoStream = fs.createWriteStream("logs/info.txt", { flags: 'a'});
+let errorStream = fs.createWriteStream("logs/error.txt", { flags: 'a'});
+let debugStream = fs.createWriteStream("logs/debug.txt", { flags: 'a'});
+let adminStream = fs.createWriteStream("logs/admin.txt", { flags: 'a'});
 
-const logger = winston.createLogger({
-    format: winston.format.combine(
-        winston.format.timestamp({format:'HH:mm:ss DD-MM-YYYY'}),
-        winston.format.json(),
-        myFormat
-    ),
-    transports: [
-        new winston.transports.Console({ level: 'info' }),   //  Put the highest level you want to log
-        new winston.transports.File({
-            filename: 'logs/combined.log',
-            level: 'info'
-          }),
-          new winston.transports.File({
-            filename: 'logs/errors.log',
-            level: 'error'
-          })
-    ]
-});
+Logger.info = function(msg) {
+  writeToStream(infoStream, msg);
+  console.log(`${server.chalk.yellow('[INFO]')} ${msg}`)
+};
 
-module.exports = logger;
+Logger.debug = function(msg) {
+  writeToStream(debugStream, msg);
+  console.log(`${server.chalk.green('[DEBUG]')} ${msg}`);
+};
+
+Logger.error = function(msg) {
+  writeToStream(errorStream, msg);
+  console.log(`${server.chalk.red('[ERROR]')} ${msg}`);
+};
+
+Logger.admin = function(msg){
+    writeToStream(adminStream, msg);
+}
+
+function writeToStream(stream, msg){
+    let message = new Date().toLocaleString() + " : " + msg + "\n";
+    stream.write(message);
+}
+
+module.exports = Logger;

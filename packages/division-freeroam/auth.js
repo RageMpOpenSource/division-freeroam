@@ -8,7 +8,7 @@ const maxExperience = requiredExperiences[maxLevel];
 
 
 mp.events.add("playerReady", async (player) => {
-    let user = `${player.socialClub}#${player.serial}`; //  Change to rsscid 1.0
+    let user = `${player.rgscId}#${player.serial}`;
     let hash = crypto.createHash('md5').update(user).digest('hex');
     player.setVariable('loggedIn', false);
 

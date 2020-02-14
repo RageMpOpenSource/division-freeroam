@@ -181,7 +181,7 @@ mp.events.addCommand({
         await server.db.query('SELECT `ID`, `Username`, `LastActive`, `Level`, `Kills`, `Deaths` FROM `accounts` WHERE `ID` = ?', [sqlID]).then(([res]) => {
             if(res.length === 0) return player.outputChatBox(`${server.prefix.error} No user found with that SQL ID`);
             let d = new Date(res[0].LastActive);
-            player.outputChatBox(`ID: ${res[0].ID}, Username: ${res[0].Username}, Last Active: ${d.toGMTString()}, Level: ${res[0].Level}, Kills: ${res[0].Kills}, Deaths: ${res[0].Deaths}`)
+            player.outputChatBox(`ID: ${res[0].ID}, Username: ${res[0].Username}, Last Active: ${d.toDateString()}, Level: ${res[0].Level}, Kills: ${res[0].Kills}, Deaths: ${res[0].Deaths}`)
         }).catch(err => server.logger.error(err));;
     },
     'weapon': (player, weapon_model) => {

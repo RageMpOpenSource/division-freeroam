@@ -8,8 +8,7 @@
     "chalk": "^3.0.0",
     "heartbeats": "^5.0.1",
     "mysql2": "^2.0.1",
-    "rage-rpc": "^0.4.0",
-    "winston": "^3.2.1"
+    "rage-rpc": "^0.4.0"
   },
   "devDependencies": {},
   "scripts": {

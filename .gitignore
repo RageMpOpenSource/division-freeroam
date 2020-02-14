@@ -1,8 +1,8 @@
-bt.dat
 conf.json
 node.dll
-server.exe
+ragemp-server.exe
 client_packages/.listcache
 node_modules
 logs
 packages/division-freeroam/config.json
+bin/
